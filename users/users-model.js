@@ -10,11 +10,11 @@ function find() {
     return db('users').select('id', 'username')
 }
 
-const findBy = username => {
+function findBy(username) {
     return db('users').where(username)
 }
 
-const add = user => {
+function add(user) {
     return db('users')
         .instert(user, 'id')
         .then(ids => {
