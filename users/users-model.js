@@ -11,12 +11,14 @@ function find() {
 }
 
 function findBy(username) {
-    return db('users').where(username)
+    return db('users')
+        .select('id', 'username', 'password')
+        .where(username)
 }
 
 function add(user) {
     return db('users')
-        .instert(user, 'id')
+        .insert(user, 'id')
         .then(ids => {
             const [id] = ids
             return (findBy(id))

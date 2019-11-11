@@ -1,8 +1,10 @@
 const router = require('express').Router()
 
+const userAuth = require('../auth/auth-middleware')
+
 const db = require('./users-model')
 
-router.get('/', (req, res) => {
+router.get('/', userAuth, (req, res) => {
     db.find()
         .then(list => {
             res.status(200).json(list)
