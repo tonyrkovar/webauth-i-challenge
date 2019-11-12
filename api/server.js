@@ -1,14 +1,12 @@
 const express = require('express')
-
 const session = require('express-session')
 const KnexSessionStorage = require('connect-session-knex')(session)
 
-
+const knexConnection = require("../data/db-config.js");
 const apiRouter = require('./api-router')
 
 const configureMiddleware = require('./configure-middleware.js')
 const server = express()
-configureMiddleware(server)
 
 const sessionConfigure = {
     name: "Cewkie",
@@ -29,8 +27,12 @@ const sessionConfigure = {
     })
 }
 
+server.get('/sess', (req, res) => {
+    res.status(200).json({ session: req.session })
+})
 
-server.use('/api', apiRouter)
+configureMiddleware(server)
 server.use(session(sessionConfigure))
+server.use('/api', apiRouter)
 
 module.exports = server;

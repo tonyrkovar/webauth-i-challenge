@@ -1,21 +1,27 @@
 const bcrypt = require('bcryptjs')
 
 const router = require('express').Router()
+const session = require('express-session')
+const KnexSessionStorage = require('connect-session-knex')(session)
 
 const db = require('../users/users-model')
 
 
 //endpoint will be /api/login
 router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    db.findBy({ username })
+    const { password, username } = req.body;
+    db.findBy(username)
         .first()
         .then(user => {
-            res.status(200).json(`hello ${username}`)
+            if (user && bcrypt.compareSync(password, user.password)) {
+                req.session.username = user.username
+                res.status(200).json(`Hello there ${username}`)
+            } else {
+                res.status(401).json('please login')
+            }
         })
-        .catch(err => {
-            res.status(400).json('invalid username')
+        .catch(errors => {
+            res.status(500).json(`bad request ${errors}`)
         })
 })
 
@@ -27,10 +33,11 @@ router.post('/register', (req, res) => {
 
         db.add(pass)
             .then(user => {
+                req.session.username = user.username
                 res.status(200).json(user)
             })
-            .catch(err => {
-                res.status(400).json({ error: `Unable to register ${err}` })
+            .catch(errors => {
+                res.status(400).json({ error: `Unable to register ${errors}` })
             })
     })
 })

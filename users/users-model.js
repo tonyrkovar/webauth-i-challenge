@@ -10,10 +10,16 @@ function find() {
     return db('users').select('id', 'username')
 }
 
-function findBy(username) {
+// function findBy(username) {
+//     return db('users')
+//         .select('username', 'password')
+//         .where(username)
+// }
+
+function findBy(filter) {
     return db('users')
         .select('id', 'username', 'password')
-        .where(username)
+        .where({ username: filter })
 }
 
 function add(user) {
