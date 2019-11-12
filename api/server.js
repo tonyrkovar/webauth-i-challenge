@@ -1,11 +1,36 @@
 const express = require('express')
 
+const session = require('express-session')
+const KnexSessionStorage = require('connect-session-knex')(session)
+
+
 const apiRouter = require('./api-router')
 
 const configureMiddleware = require('./configure-middleware.js')
 const server = express()
 configureMiddleware(server)
 
+const sessionConfigure = {
+    name: "Cewkie",
+    secret: process.env.COOKIE_SECRET || "Is this session valid?",
+    cookie: {
+        maxAge: 1000 * 60 * 45,
+        secure: process.env.NODE_ENV === "development" ? false : true,
+        httpOnly: true
+    },
+    resave: false,
+    saveUninitialized: true,
+    store: new KnexSessionStorage({
+        knex: knexConnection,
+        clearInterval: 1000 * 60 * 20,
+        tablename: "user_sessions",
+        sidfieldname: "id",
+        createtable: true
+    })
+}
+
+
 server.use('/api', apiRouter)
+server.use(session(sessionConfigure))
 
 module.exports = server;
